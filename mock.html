@@ -15,11 +15,12 @@
             width: 80%;
             margin-top: 20px;
             display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         canvas {
-            width: 100% !important;
             max-width: 800px;
-            height: auto !important;
+            height: auto;
             border-radius: 10px;
             box-shadow: 1.5px 1px 4px 1px rgb(78, 78, 79);
         }
@@ -29,42 +30,37 @@
             flex-direction: column;
             align-items: center;
         }
-        .input-container input, textarea {
+        .input-container input,
+        .input-container textarea {
             margin: 5px;
-            font-size: medium;
-            box-shadow: .5px 1px 8px 1px rgb(159, 159, 159);
-            color: brown;
             padding: 5px;
-            height: 20px;
-            font-weight: bolder;
+            font-size: medium;
+            box-shadow: 0.5px 1px 8px 1px rgb(159, 159, 159);
             border-radius: 10px;
+            font-weight: bold;
         }
-        .input-container .save, .input-container .clear {
+        .input-container button {
             margin: 10px;
-            display: flex;
-            flex-direction: row;
             padding: 10px;
-            box-shadow: .5px 0.3px 15px 0.5px rgb(90, 87, 87);
+            box-shadow: 0.5px 0.3px 15px 0.5px rgb(90, 87, 87);
             border-radius: 5px;
             font-size: medium;
             font-weight: bold;
-            color: rgb(255, 254, 254);
-            cursor: pointer;
+            color: #fff;
         }
-        .input-container .save {
+        .save {
             background-color: rgb(21, 174, 44);
         }
-        .input-container .clear {
+        .clear {
             background-color: rgb(138, 2, 2);
         }
-        #tier1Average, #tier2Average {
+        #tier1Average,
+        #tier2Average {
             padding: 8px;
-            box-shadow: .5px 0.3px 15px 0.5px rgb(90, 87, 87);
             border-radius: 5px;
-            color: antiquewhite;
+            color: #fff;
             background-color: rgb(8, 99, 174);
             font-family: cursive;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -98,22 +94,22 @@
             <h3 id="tier2Average">Average Marks: 0</h3>
         </div>
     </div>
-
-    <!-- Firebase Integration -->
+    
+    <!-- Firebase SDK and Chart.js -->
     <script type="module">
-        // Import Firebase
+        // Import the Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+        import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
-        // Your Firebase configuration
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
-            authDomain: "local-to-firebass.firebaseapp.com",
-            databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "local-to-firebass",
-            storageBucket: "local-to-firebass.appspot.com",
-            messagingSenderId: "121890064671",
-            appId: "1:121890064671:web:9143764a66282571c1c82a"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         // Initialize Firebase
@@ -130,13 +126,15 @@
             const date = new Date().toISOString().split('T')[0];
 
             if (tier1Marks !== "") {
-                const newEntryRef = push(ref(db, 'tier1Data'));
-                set(newEntryRef, { date, marks: parseInt(tier1Marks), comment: tier1Comment }).then(() => {
-                    tier1Data.push({ date, marks: parseInt(tier1Marks), comment: tier1Comment });
-                    renderTier1Chart();
-                    updateTier1Average();
-                    clearTier1Input();
-                }).catch(error => console.error("Error saving Tier 1 data: ", error));
+                const newEntry = { date, marks: parseInt(tier1Marks), comment: tier1Comment };
+                tier1Data.push(newEntry);
+
+                // Save to Firebase
+                set(ref(db, 'tier1Data'), tier1Data);
+
+                clearTier1Input();
+                renderTier1Chart();
+                updateTier1Average();
             }
         }
 
@@ -146,51 +144,53 @@
             const date = new Date().toISOString().split('T')[0];
 
             if (tier2Marks !== "") {
-                const newEntryRef = push(ref(db, 'tier2Data'));
-                set(newEntryRef, { date, marks: parseInt(tier2Marks), comment: tier2Comment }).then(() => {
-                    tier2Data.push({ date, marks: parseInt(tier2Marks), comment: tier2Comment });
-                    renderTier2Chart();
-                    updateTier2Average();
-                    clearTier2Input();
-                }).catch(error => console.error("Error saving Tier 2 data: ", error));
+                const newEntry = { date, marks: parseInt(tier2Marks), comment: tier2Comment };
+                tier2Data.push(newEntry);
+
+                // Save to Firebase
+                set(ref(db, 'tier2Data'), tier2Data);
+
+                clearTier2Input();
+                renderTier2Chart();
+                updateTier2Average();
             }
         }
 
         function resetTier1Data() {
+            // Clear data in Firebase
             remove(ref(db, 'tier1Data')).then(() => {
                 tier1Data = [];
-                renderTier1Chart();
-                updateTier1Average();
-            }).catch(error => console.error("Error resetting Tier 1 data: ", error));
-        }
-
-        function resetTier2Data() {
-            remove(ref(db, 'tier2Data')).then(() => {
-                tier2Data = [];
-                renderTier2Chart();
-                updateTier2Average();
-            }).catch(error => console.error("Error resetting Tier 2 data: ", error));
-        }
-
-        function loadTier1Data() {
-            onValue(ref(db, 'tier1Data'), (snapshot) => {
-                tier1Data = [];
-                snapshot.forEach(childSnapshot => {
-                    tier1Data.push(childSnapshot.val());
-                });
                 renderTier1Chart();
                 updateTier1Average();
             });
         }
 
-        function loadTier2Data() {
-            onValue(ref(db, 'tier2Data'), (snapshot) => {
+        function resetTier2Data() {
+            // Clear data in Firebase
+            remove(ref(db, 'tier2Data')).then(() => {
                 tier2Data = [];
-                snapshot.forEach(childSnapshot => {
-                    tier2Data.push(childSnapshot.val());
-                });
                 renderTier2Chart();
                 updateTier2Average();
+            });
+        }
+
+        function loadTier1Data() {
+            get(child(ref(db), 'tier1Data')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    tier1Data = snapshot.val() || [];
+                    renderTier1Chart();
+                    updateTier1Average();
+                }
+            });
+        }
+
+        function loadTier2Data() {
+            get(child(ref(db), 'tier2Data')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    tier2Data = snapshot.val() || [];
+                    renderTier2Chart();
+                    updateTier2Average();
+                }
             });
         }
 
@@ -200,7 +200,6 @@
 
             const tier1Labels = tier1Data.map(entry => formatDate(entry.date));
             const tier1Marks = tier1Data.map(entry => entry.marks);
-            const tier1Comments = tier1Data.map(entry => entry.comment);
 
             tier1Chart = new Chart(ctx1, {
                 type: 'line',
@@ -214,7 +213,8 @@
                         pointBackgroundColor: tier1Marks.map(() => 'rgba(174, 8, 8)'),
                         pointHoverBackgroundColor: 'rgba(0, 0, 0)',
                         pointHoverBorderColor: 'rgba(0, 0, 0)',
-                        pointHoverRadius: 10
+                        pointHoverRadius: 5,
+                        pointRadius: 3
                     }]
                 },
                 options: {
@@ -223,7 +223,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    return `Marks: ${context.raw}, Comment: ${tier1Comments[context.dataIndex]}`;
+                                    return `Marks: ${context.raw}, Comment: ${tier1Data[context.dataIndex].comment}`;
                                 }
                             }
                         }
@@ -238,7 +238,6 @@
 
             const tier2Labels = tier2Data.map(entry => formatDate(entry.date));
             const tier2Marks = tier2Data.map(entry => entry.marks);
-            const tier2Comments = tier2Data.map(entry => entry.comment);
 
             tier2Chart = new Chart(ctx2, {
                 type: 'line',
@@ -247,12 +246,13 @@
                     datasets: [{
                         label: 'Tier 2 Marks',
                         data: tier2Marks,
-                        borderColor: 'brown',
+                        borderColor: 'black',
                         borderWidth: 1.5,
-                        pointBackgroundColor: tier2Marks.map(() => 'rgba(94, 15, 15)'),
+                        pointBackgroundColor: tier2Marks.map(() => 'rgba(174, 8, 8)'),
                         pointHoverBackgroundColor: 'rgba(0, 0, 0)',
                         pointHoverBorderColor: 'rgba(0, 0, 0)',
-                        pointHoverRadius: 10
+                        pointHoverRadius: 5,
+                        pointRadius: 3
                     }]
                 },
                 options: {
@@ -261,30 +261,13 @@
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    return `Marks: ${context.raw}, Comment: ${tier2Comments[context.dataIndex]}`;
+                                    return `Marks: ${context.raw}, Comment: ${tier2Data[context.dataIndex].comment}`;
                                 }
                             }
                         }
                     }
                 }
             });
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-        }
-
-        function updateTier1Average() {
-            const totalMarks = tier1Data.reduce((sum, entry) => sum + entry.marks, 0);
-            const average = (tier1Data.length > 0) ? (totalMarks / tier1Data.length).toFixed(2) : 0;
-            document.getElementById('tier1Average').textContent = `Average Marks: ${average}`;
-        }
-
-        function updateTier2Average() {
-            const totalMarks = tier2Data.reduce((sum, entry) => sum + entry.marks, 0);
-            const average = (tier2Data.length > 0) ? (totalMarks / tier2Data.length).toFixed(2) : 0;
-            document.getElementById('tier2Average').textContent = `Average Marks: ${average}`;
         }
 
         function clearTier1Input() {
@@ -297,13 +280,28 @@
             document.getElementById('tier2Comment').value = '';
         }
 
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString();
+        }
+
+        function updateTier1Average() {
+            const total = tier1Data.reduce((sum, entry) => sum + entry.marks, 0);
+            const average = tier1Data.length ? (total / tier1Data.length).toFixed(2) : 0;
+            document.getElementById('tier1Average').innerText = `Average Marks: ${average}`;
+        }
+
+        function updateTier2Average() {
+            const total = tier2Data.reduce((sum, entry) => sum + entry.marks, 0);
+            const average = tier2Data.length ? (total / tier2Data.length).toFixed(2) : 0;
+            document.getElementById('tier2Average').innerText = `Average Marks: ${average}`;
+        }
+
+        // Load data on page load
         window.onload = function() {
             loadTier1Data();
             loadTier2Data();
         };
     </script>
-
-    <!-- Include Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
