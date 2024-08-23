@@ -102,16 +102,15 @@
         import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
         // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
+       const firebaseConfig = {
+  apiKey: "AIzaSyDyqLW6K7aMZudaGHRvxrceQDaANQE4c4Q",
+  authDomain: "local-to-firebass.firebaseapp.com",
+  databaseURL: "https://local-to-firebass-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "local-to-firebass",
+  storageBucket: "local-to-firebass.appspot.com",
+  messagingSenderId: "121890064671",
+  appId: "1:121890064671:web:9143764a66282571c1c82a"
+};
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
