@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supporting Documents</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .section {
+            margin: 15px;
+            width: 100%; /* Full width on mobile */
+            max-width: 600px; /* Restrict max width */
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            background-color: #fff;
+        }
+        .label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 18px;
+            color: #555;
+        }
+        img, audio, iframe {
+            width: 100%;
+            border-radius: 5px;
+        }
+        audio {
+            margin-top: 10px;
+        }
+
+        /* Different background colors for each section */
+        .section:nth-child(1) { background-color: #e6f7ff; } /* Light blue */
+        .section:nth-child(2) { background-color: #f9f0ff; } /* Light purple */
+        .section:nth-child(3) { background-color: #fef0e6; } /* Light orange */
+        .section:nth-child(4) { background-color: #f0f7e6; } /* Light green */
+        .section:nth-child(5) { background-color: #fff7e6; } /* Light yellow */
+
+        /* Hover effects */
+        .section:hover {
+            background-color: #d3d3d3;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Media query for PC: 2 sections per row */
+        @media (min-width: 768px) {
+            .section {
+                width: 45%; /* Set width for 2-column layout */
+            }
+        }
+
+        /* YouTube video responsive fix */
+        .section iframe {
+            width: 100%;           /* Full width of the container */
+            aspect-ratio: 16 / 9;  /* Maintain 16:9 aspect ratio */
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Supporting Documents</h1>
+    <div class="container">
+        <!-- Panchayat Head Application -->
+        <div class="section">
+            <span class="label">Panchayat Head Application</span>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3-Uw4zyfiolRHaxZC8cFbnPdh6cKY5-2Eypm_TZS5_PdpkWSxIXTs8skBG0z8V67wgKLcqC5h53FArCBhDUpqznrjWVQBtxQgB01vOMF6eenOkx6pIWt6T6JLsPSEf_nWkeLgJRnHRqeMAJAUL6An0uCy-vSf9prruybt0dailESc6WhQcIrfVv2wb4k/s2958/application%20to%20village%20head.jpg" alt="Panchayat Head Application">
+        </div>
+
+        <!-- Tehsil Application -->
+        <div class="section">
+            <span class="label">Tehsil Application</span>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiYt5QcgGUpSNpM7Jc1dt8zPnfNg6S5HOMEvJ_bkFPeDbCL1c1ULpbDekE6W3qRMVCTsiSffjZFE9xW_OClMXVBC2mJkz3YMxHygTw_5TcKF82W8MtRTi4i4uUe0oyz1fO6WNhUMp0uze6EXgC2UmCf_1EFBKux-Gx-_YD9YW3vAb6yMv5m3AtbKtPFPoA/s3230/tehsil%20application%20with%20authority%20signature.jpg" alt="Tehsil Application">
+        </div>
+
+        <!-- Issue Map Description -->
+        <div class="section">
+            <span class="label">Issue Description Map</span>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhoFOPNXtxP66R51OL9-RwmNN-3ShrnZ_2r6Wezl4pzc_5oo0BkPuqn4LJYrvMm7GG6qdN3ACbI9cg5yFRxhW2zFt40u3qQ1Bhw-AObcjwOXsnPujCcEsqVKMQgeoLpvvIVlsdrNxdTiAak3I5Jr8VBu7-_SMzBwg51HIS9VmJ29L6ye_GOJHpYCBFPVs8/s320-rw/IMG_20241112_233415.jpg" alt="Issue Map">
+        </div>
+
+        <!-- YouTube Video -->
+        <div class="section">
+            <span class="label">Related YouTube Video</span>
+            <iframe src="https://www.youtube.com/embed/N9b3scFsbaA?si=65FC_eHZM_nPsTbG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+
+        <!-- Patwari Visit Audio -->
+        <div class="section">
+            <span class="label">Patwari Visit Audio</span>
+            <audio controls>
+                <source src="https://firebasestorage.googleapis.com/v0/b/local-to-firebass.appspot.com/o/audios%2Frelated%20audio%20file.mp3?alt=media&token=ec467fc8-3e57-46f0-b835-f31795b8ff50" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+</body>
+</html>
