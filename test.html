@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sound Frequency Analyzer</title>
+  <title>Human Voice Frequency Analyzer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -33,8 +33,8 @@
   </style>
 </head>
 <body>
-  <h1>Sound Frequency Analyzer</h1>
-  <p>Click the button to measure the dominant frequency of the surrounding sound:</p>
+  <h1>Human Voice Frequency Analyzer</h1>
+  <p>Click the button to detect the frequency of human voice:</p>
   <div id="frequency">Frequency: -- Hz</div>
   <button onclick="startListening()">Start Listening</button>
 
@@ -53,25 +53,36 @@
         analyser.fftSize = 2048;
         microphone.connect(analyser);
 
-        function getDominantFrequency() {
+        function getHumanVoiceFrequency() {
           analyser.getByteFrequencyData(fftData);
+
+          const nyquist = sampleRate / 2; // Nyquist frequency
+          const binSize = nyquist / fftData.length;
 
           let maxIndex = 0;
           let maxValue = 0;
-          for (let i = 0; i < fftData.length; i++) {
+
+          // Focus only on frequencies in the human voice range (85 Hz to 255 Hz)
+          const minIndex = Math.floor(85 / binSize);  // Lower bound index
+          const maxIndexRange = Math.floor(255 / binSize); // Upper bound index
+
+          for (let i = minIndex; i <= maxIndexRange; i++) {
             if (fftData[i] > maxValue) {
               maxValue = fftData[i];
               maxIndex = i;
             }
           }
 
-          const nyquist = sampleRate / 2; // Nyquist frequency
-          const frequency = (maxIndex / fftData.length) * nyquist;
+          const frequency = maxIndex * binSize;
 
-          frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
+          if (frequency >= 85 && frequency <= 255) {
+            frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz (Human Voice Detected)`;
+          } else {
+            frequencyDisplay.innerText = `Frequency: -- Hz (No Human Voice)`;
+          }
         }
 
-        setInterval(getDominantFrequency, 100); // Update frequency every 100ms
+        setInterval(getHumanVoiceFrequency, 100); // Update frequency every 100ms
       } catch (error) {
         frequencyDisplay.innerText = 'Error: Unable to access microphone.';
         console.error(error);
@@ -80,4 +91,3 @@
   </script>
 </body>
 </html>
-
