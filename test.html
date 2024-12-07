@@ -1,1 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Frequency Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #4CAF50;
+    }
+    #frequency {
+      font-size: 2rem;
+      margin: 20px 0;
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sound Frequency Analyzer</h1>
+  <p>Click the button to measure the dominant frequency of the surrounding sound:</p>
+  <div id="frequency">Frequency: -- Hz</div>
+  <button onclick="startListening()">Start Listening</button>
+
+  <script>
+    async function startListening() {
+      const frequencyDisplay = document.getElementById('frequency');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        const fftData = new Uint8Array(analyser.frequencyBinCount);
+        const sampleRate = audioContext.sampleRate;
+
+        analyser.fftSize = 2048;
+        microphone.connect(analyser);
+
+        function getDominantFrequency() {
+          analyser.getByteFrequencyData(fftData);
+
+          let maxIndex = 0;
+          let maxValue = 0;
+          for (let i = 0; i < fftData.length; i++) {
+            if (fftData[i] > maxValue) {
+              maxValue = fftData[i];
+              maxIndex = i;
+            }
+          }
+
+          const nyquist = sampleRate / 2; // Nyquist frequency
+          const frequency = (maxIndex / fftData.length) * nyquist;
+
+          frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
+        }
+
+        setInterval(getDominantFrequency, 100); // Update frequency every 100ms
+      } catch (error) {
+        frequencyDisplay.innerText = 'Error: Unable to access microphone.';
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
 
