@@ -3,20 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Human Voice Frequency Analyzer</title>
+  <title>Light Intensity Meter</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
+      background-color: #f4f4f4;
     }
     h1 {
       color: #4CAF50;
     }
-    #frequency {
+    #light-intensity {
       font-size: 2rem;
       margin: 20px 0;
       color: #333;
+    }
+    #status {
+      font-size: 1rem;
+      color: #666;
     }
     button {
       padding: 10px 20px;
@@ -33,59 +38,33 @@
   </style>
 </head>
 <body>
-  <h1>Human Voice Frequency Analyzer</h1>
-  <p>Click the button to detect the frequency of human voice:</p>
-  <div id="frequency">Frequency: -- Hz</div>
-  <button onclick="startListening()">Start Listening</button>
+  <h1>Light Intensity Meter</h1>
+  <p>Click the button to measure ambient light intensity:</p>
+  <div id="light-intensity">Light Intensity: -- lux</div>
+  <div id="status"></div>
+  <button onclick="startLightMeasurement()">Start Measuring</button>
 
   <script>
-    async function startListening() {
-      const frequencyDisplay = document.getElementById('frequency');
+    function startLightMeasurement() {
+      const lightIntensityDisplay = document.getElementById('light-intensity');
+      const statusDisplay = document.getElementById('status');
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(stream);
-        const fftData = new Uint8Array(analyser.frequencyBinCount);
-        const sampleRate = audioContext.sampleRate;
-
-        analyser.fftSize = 2048;
-        microphone.connect(analyser);
-
-        function getHumanVoiceFrequency() {
-          analyser.getByteFrequencyData(fftData);
-
-          const nyquist = sampleRate / 2; // Nyquist frequency
-          const binSize = nyquist / fftData.length;
-
-          let maxIndex = 0;
-          let maxValue = 0;
-
-          // Focus only on frequencies in the human voice range (85 Hz to 255 Hz)
-          const minIndex = Math.floor(85 / binSize);  // Lower bound index
-          const maxIndexRange = Math.floor(255 / binSize); // Upper bound index
-
-          for (let i = minIndex; i <= maxIndexRange; i++) {
-            if (fftData[i] > maxValue) {
-              maxValue = fftData[i];
-              maxIndex = i;
-            }
-          }
-
-          const frequency = maxIndex * binSize;
-
-          if (frequency >= 85 && frequency <= 255) {
-            frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz (Human Voice Detected)`;
-          } else {
-            frequencyDisplay.innerText = `Frequency: -- Hz (No Human Voice)`;
-          }
+      if ('AmbientLightSensor' in window) {
+        try {
+          const sensor = new AmbientLightSensor();
+          sensor.addEventListener('reading', () => {
+            lightIntensityDisplay.innerText = `Light Intensity: ${sensor.illuminance.toFixed(2)} lux`;
+            statusDisplay.innerText = 'Ambient light sensor is active.';
+          });
+          sensor.addEventListener('error', (event) => {
+            statusDisplay.innerText = `Sensor error: ${event.error.message}`;
+          });
+          sensor.start();
+        } catch (error) {
+          statusDisplay.innerText = `Error: ${error.message}`;
         }
-
-        setInterval(getHumanVoiceFrequency, 100); // Update frequency every 100ms
-      } catch (error) {
-        frequencyDisplay.innerText = 'Error: Unable to access microphone.';
-        console.error(error);
+      } else {
+        statusDisplay.innerText = 'Ambient Light Sensor API is not supported on this device.';
       }
     }
   </script>
