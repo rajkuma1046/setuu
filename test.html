@@ -3,86 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Device Information</title>
+  <title>Smart Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
-      background-color: #f9f9f9;
+      background-color: #f4f4f4;
     }
     h1 {
       color: #4CAF50;
     }
-    table {
+    #calculator {
+      display: inline-block;
       margin: 20px auto;
-      border-collapse: collapse;
-      width: 80%;
-      max-width: 600px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border: 2px solid #4CAF50;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    th, td {
-      border: 1px solid #ddd;
+    input, button {
       padding: 10px;
-      text-align: left;
+      margin: 10px 5px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
-    th {
+    button {
       background-color: #4CAF50;
       color: white;
+      cursor: pointer;
     }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
+    button:hover {
+      background-color: #45a049;
+    }
+    #history {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 500px;
+      margin: auto;
+    }
+    .training-msg {
+      color: #4CAF50;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>Device Information</h1>
-  <p>Below is the information about your device:</p>
-  <table>
-    <thead>
-      <tr>
-        <th>Property</th>
-        <th>Value</th>
-      </tr>
-    </thead>
-    <tbody id="device-info"></tbody>
-  </table>
+  <h1>Smart Calculator</h1>
+  <div id="calculator">
+    <input id="expression" type="text" placeholder="Enter calculation (e.g., 5+5)" />
+    <button onclick="calculate()">Calculate</button>
+    <p id="result">Result: --</p>
+  </div>
+
+  <div id="history">
+    <h3>Calculation History</h3>
+    <ul id="history-list"></ul>
+  </div>
+
+  <p class="training-msg" id="training-message"></p>
 
   <script>
-    function getDeviceInfo() {
-      const infoTable = document.getElementById('device-info');
-      const deviceData = [
-        { property: 'User Agent', value: navigator.userAgent },
-        { property: 'Platform', value: navigator.platform },
-        { property: 'Language', value: navigator.language },
-        { property: 'Online Status', value: navigator.onLine ? 'Online' : 'Offline' },
-        { property: 'Screen Width', value: screen.width + ' px' },
-        { property: 'Screen Height', value: screen.height + ' px' },
-        { property: 'Available Width', value: screen.availWidth + ' px' },
-        { property: 'Available Height', value: screen.availHeight + ' px' },
-        { property: 'Color Depth', value: screen.colorDepth + ' bits' },
-        { property: 'Pixel Depth', value: screen.pixelDepth + ' bits' },
-        { property: 'Cookies Enabled', value: navigator.cookieEnabled ? 'Yes' : 'No' },
-        { property: 'JavaScript Enabled', value: 'Yes' }, // If this script is running, JavaScript is enabled
-        { property: 'Connection Type', value: navigator.connection?.effectiveType || 'Not Available' },
-        { property: 'Device Memory', value: navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'Not Available' },
-        { property: 'Hardware Concurrency', value: navigator.hardwareConcurrency || 'Not Available' }
-      ];
+    const history = JSON.parse(localStorage.getItem('calcHistory')) || [];
+    const model = JSON.parse(localStorage.getItem('calcModel')) || {};
 
-      deviceData.forEach((data) => {
-        const row = document.createElement('tr');
-        const propertyCell = document.createElement('td');
-        const valueCell = document.createElement('td');
-        propertyCell.textContent = data.property;
-        valueCell.textContent = data.value;
-        row.appendChild(propertyCell);
-        row.appendChild(valueCell);
-        infoTable.appendChild(row);
+    // Update history in UI
+    function updateHistory() {
+      const historyList = document.getElementById('history-list');
+      historyList.innerHTML = '';
+      history.forEach((entry) => {
+        const li = document.createElement('li');
+        li.textContent = `${entry.expression} = ${entry.result}`;
+        historyList.appendChild(li);
       });
     }
 
-    // Populate the table with device information
-    getDeviceInfo();
+    // Save calculation to history
+    function saveToHistory(expression, result) {
+      history.push({ expression, result });
+      if (history.length > 10) history.shift(); // Keep history to 10 items max
+      localStorage.setItem('calcHistory', JSON.stringify(history));
+    }
+
+    // Train the "model"
+    function trainModel(expression, result) {
+      if (!model[expression]) {
+        model[expression] = { count: 0, result };
+      }
+      model[expression].count += 1;
+      localStorage.setItem('calcModel', JSON.stringify(model));
+      showTrainingMessage(expression);
+    }
+
+    // Show training message
+    function showTrainingMessage(expression) {
+      const message = document.getElementById('training-message');
+      const trained = model[expression]?.count || 0;
+      message.textContent = `This expression has been trained ${trained} times.`;
+      setTimeout(() => (message.textContent = ''), 3000);
+    }
+
+    // Perform calculation
+    function calculate() {
+      const expression = document.getElementById('expression').value.trim();
+      if (!expression) return alert('Please enter a valid expression!');
+
+      // Check if the expression has been trained
+      if (model[expression]) {
+        document.getElementById('result').textContent = `Result: ${model[expression].result} (from training)`;
+        trainModel(expression, model[expression].result);
+        saveToHistory(expression, model[expression].result);
+        updateHistory();
+        return;
+      }
+
+      // Perform calculation dynamically
+      try {
+        const result = eval(expression); // Use with caution, only for trusted input
+        document.getElementById('result').textContent = `Result: ${result}`;
+        saveToHistory(expression, result);
+        trainModel(expression, result);
+        updateHistory();
+      } catch (error) {
+        alert('Invalid expression!');
+      }
+    }
+
+    // Initialize history on page load
+    updateHistory();
   </script>
 </body>
 </html>
