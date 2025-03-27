@@ -17,12 +17,13 @@
     }
     .container {
       width: 90%;
-      max-width: 600px;
+      max-width: 800px;
       background: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       margin: auto;
+      margin-bottom: 20px;
     }
     h1, h2, h3 {
       color: #5A67D8;
@@ -35,7 +36,7 @@
       border-radius: 6px;
       font-size: 14px;
     }
-    /* Save buttons in green */
+    /* Save buttons */
     button {
       width: 100%;
       padding: 10px;
@@ -62,10 +63,12 @@
     }
     .checkbox-container, .category-container {
       display: flex;
-      flex-direction: raw;
+      flex-direction: row;
       align-items: center;
       gap: 10px;
       margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .category-container label {
       font-size: 16px;
@@ -154,21 +157,26 @@
       font-weight: bold;
       margin-left: 5px;
     }
-    /* Extra Boxes Container */
+    /* Extra Boxes Styles */
     .extra-boxes {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
       margin-top: 30px;
+      justify-content: center;
     }
     .box {
       flex: 1;
       min-width: 280px;
+      max-width: 380px;
       border: 1px solid #ccc;
       border-radius: 10px;
       padding: 10px;
       background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      max-height: 400px; /* Fixed height for the whole box */
     }
     .box-title {
       margin: 0;
@@ -180,6 +188,10 @@
     }
     .box-content {
       padding: 10px;
+      flex-grow: 1;
+      overflow-y: auto; /* Scrollable content */
+      border-top: 1px solid #ddd;
+      margin-top: 10px;
     }
     .box-content ul {
       list-style: none;
@@ -197,7 +209,6 @@
       flex-direction: column;
       gap: 5px;
     }
-    /* Enlarged Delete Button (red circle with centered cross) */
     .delete-btn {
       position: absolute;
       top: 50%;
@@ -214,16 +225,15 @@
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    /* Badge View for Labels */
+    /* Badge styles for Labels */
     .badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 4px 8px;
-      margin-right: 4px;
-      margin-bottom: 4px;
+      margin: 2px;
       border-radius: 12px;
-      color: #f8f9fa; /* Light text */
+      color: #f8f9fa;
       font-size: 0.85em;
       font-weight: bold;
     }
@@ -233,7 +243,6 @@
       gap: 4px;
       margin-top: 4px;
     }
-    /* Reset Buttons for Extra Boxes */
     .box-reset-btn {
       background: #E53E3E;
       width: auto;
@@ -241,28 +250,30 @@
       font-size: 14px;
       margin-top: 10px;
     }
-    /* Import file input styling */
     input[type="file"] {
       margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <!-- Main Thought Evaluator Content -->
+  <!-- Main Thought Evaluator -->
   <div class="container">
     <h1>Thought Evaluator</h1>
     <textarea id="thoughtInput" placeholder="Write your thought..."></textarea>
+    <!-- Labels input -->
+    <input type="text" id="thoughtLabels" placeholder="Additional labels (comma-separated)" />
+    <!-- Category selection with Hindi names -->
     <div class="category-container" id="categories">
-      <label><input type="checkbox" value="Buddi" /> Buddi</label>
-      <label><input type="checkbox" value="Vivek" /> Vivek</label>
-      <label><input type="checkbox" value="Sanskar" /> Sanskar</label>
-      <label><input type="checkbox" value="Chitta" /> Chitta</label>
+      <label><input type="checkbox" value="बुद्धि" /> बुद्धि</label>
+      <label><input type="checkbox" value="विवेक" /> विवेक</label>
+      <label><input type="checkbox" value="संस्कार" /> संस्कार</label>
+      <label><input type="checkbox" value="चित्त" /> चित्त</label>
+      <label><input type="checkbox" value="शरीर" /> शरीर</label>
     </div>
     <div class="checkbox-container">
       <label><input type="checkbox" id="prejudiced" /> Prejudiced</label>
     </div>
     <button onclick="saveThought()">Save Thought</button>
-    <!-- Additional Global Controls -->
     <button class="btn-secondary" onclick="resetAllData()">Reset All Data</button>
     <button onclick="exportData()">Export Data</button>
     <input type="file" id="importFile" onchange="importData(event)" />
@@ -281,7 +292,7 @@
     <div id="calendar"></div>
   </div>
 
-  <!-- Modal for showing thoughts on a selected day -->
+  <!-- Modal for Daily Thoughts -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span id="closeModal" class="close">&times;</span>
@@ -295,7 +306,6 @@
     <div class="box" id="box1">
       <h3 class="box-title">Buddhy > Past Memories & Experiences</h3>
       <div class="box-content">
-        <!-- Birth Year Input -->
         <div id="birthYearContainer">
           <label>Your Birth Year: <input type="number" id="birthYearInput" placeholder="e.g. 1990" /></label>
           <button onclick="saveBirthYear()">Save Birth Year</button>
@@ -306,7 +316,7 @@
           <button onclick="saveMemory()">Save Memory</button>
         </div>
         <button class="box-reset-btn" onclick="resetBox('memories')">Reset Box</button>
-        <div id="memoryList"></div>
+        <div id="memoryList" class="list-container"></div>
       </div>
     </div>
     <!-- Box 2: Ego (aham) -->
@@ -314,11 +324,11 @@
       <h3 class="box-title">Sanskar > Ego (aham)</h3>
       <div class="box-content">
         <textarea id="egoText" placeholder="Enter your ego description..."></textarea>
-        <input type="text" id="egoTime"/>
+        <!-- Time field removed; labels input remains -->
         <input type="text" id="egoLabels" placeholder="Additional labels (comma-separated)" />
         <button onclick="saveEgo()">Save Ego</button>
         <button class="box-reset-btn" onclick="resetBox('ego')">Reset Box</button>
-        <div id="egoList"></div>
+        <div id="egoList" class="list-container"></div>
       </div>
     </div>
     <!-- Box 3: Habits -->
@@ -329,12 +339,22 @@
         <input type="text" id="habitLabels" placeholder="Additional labels (comma-separated)" />
         <button onclick="saveHabit()">Save Habit</button>
         <button class="box-reset-btn" onclick="resetBox('habits')">Reset Box</button>
-        <div id="habitList"></div>
+        <div id="habitList" class="list-container"></div>
       </div>
     </div>
   </div>
 
   <script>
+    /* ---------- Utility Function for Colorful Labels ---------- */
+    function getLabelColors(labels) {
+      const palette = ["#2c3e50", "#8e44ad", "#16a085", "#27ae60", "#2980b9", "#d35400", "#c0392b", "#e67e22", "#1abc9c"];
+      let colors = [];
+      for (let i = 0; i < labels.length; i++) {
+        colors.push(palette[i % palette.length]);
+      }
+      return colors;
+    }
+
     /* ---------- Main Thought Evaluator Functions ---------- */
     function getISTTimestamp() {
       const now = new Date();
@@ -346,16 +366,18 @@
       const thought = document.getElementById("thoughtInput").value;
       const prejudiced = document.getElementById("prejudiced").checked;
       const { full: timestamp, date: todayIST } = getISTTimestamp();
+      const labels = document.getElementById("thoughtLabels").value.split(',').map(label => label.trim()).filter(Boolean);
       let categories = [];
-      document.querySelectorAll(".category-container label").forEach(label => {
-        const checkbox = label.querySelector("input[type='checkbox']");
+      document.querySelectorAll(".category-container label").forEach(labelEl => {
+        const checkbox = labelEl.querySelector("input[type='checkbox']");
         if (checkbox.checked) { categories.push({ type: checkbox.value }); }
       });
       if (thought.trim() && categories.length) {
         let thoughts = JSON.parse(localStorage.getItem("thoughts")) || [];
-        thoughts.push({ thought, categories, prejudiced, timestamp });
+        thoughts.push({ thought, categories, labels, prejudiced, timestamp });
         localStorage.setItem("thoughts", JSON.stringify(thoughts));
         document.getElementById("thoughtInput").value = "";
+        document.getElementById("thoughtLabels").value = "";
         updateChart(todayIST);
         generateCalendar();
       } else {
@@ -394,7 +416,7 @@
     function updateChart(dateFilter = null) {
       const targetDate = dateFilter || getISTTimestamp().date;
       let thoughts = JSON.parse(localStorage.getItem("thoughts")) || [];
-      let data = { Buddi: 0, Vivek: 0, Sanskar: 0, Chitta: 0 };
+      let data = { "बुद्धि": 0, "विवेक": 0, "संस्कार": 0, "चित्त": 0, "शरीर": 0 };
       thoughts.forEach(t => {
         let tDate = t.timestamp.split(' ')[0];
         if (tDate === targetDate) {
@@ -406,12 +428,12 @@
       const ctx = document.getElementById("thoughtClock").getContext("2d");
       if (chart) chart.destroy();
       let values = Object.values(data);
-      if (values.every(val => val === 0)) { values = [1, 1, 1, 1]; }
+      if (values.every(val => val === 0)) { values = [1, 1, 1, 1, 1]; }
       chart = new Chart(ctx, {
         type: "polarArea",
         data: {
           labels: Object.keys(data),
-          datasets: [{ data: values, backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"] }]
+          datasets: [{ data: values, backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#8e44ad"] }]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
@@ -477,9 +499,17 @@
       filtered.forEach(t => {
         let time = t.timestamp.split(' ')[1];
         let prejudiceTag = t.prejudiced ? '<span class="prejudiced-tag">pre-judgeed</span>' : '';
+        let colors = getLabelColors(t.labels || []);
+        let labelsHtml = "";
+        if(t.labels) {
+          t.labels.forEach((label, idx) => {
+            labelsHtml += `<span class="badge" style="background-color:${colors[idx]};">#${label}</span> `;
+          });
+        }
         content += `<li>
                       <div class="timestamp">${time}</div>
                       <div class="thought-text">${t.thought} ${prejudiceTag}</div>
+                      <div class="badge-container">${labelsHtml}</div>
                     </li>`;
       });
       content += "</ul>";
@@ -536,45 +566,31 @@
     // Box 2: Ego
     function saveEgo() {
       const egoText = document.getElementById("egoText").value;
-      const egoTime = document.getElementById("egoTime").value;
-      const egoLabels = document.getElementById("egoLabels").value;
+      const egoLabels = document.getElementById("egoLabels").value.split(',').map(label => label.trim()).filter(Boolean);
       if (egoText.trim()) {
         let ego = JSON.parse(localStorage.getItem("ego")) || [];
-        ego.push({ egoText, egoTime, egoLabels });
+        ego.push({ egoText, egoLabels });
         localStorage.setItem("ego", JSON.stringify(ego));
         document.getElementById("egoText").value = "";
-        document.getElementById("egoTime").value = "";
         document.getElementById("egoLabels").value = "";
         updateEgoList();
       } else {
         alert("Please enter an ego description.");
       }
     }
-    function getBadgeColor(label) {
-      const colors = ["#2c3e50", "#8e44ad", "#16a085", "#27ae60", "#2980b9", "#d35400", "#c0392b"];
-      let hash = 0;
-      for (let i = 0; i < label.length; i++) { hash = label.charCodeAt(i) + ((hash << 5) - hash); }
-      let index = Math.abs(hash) % colors.length;
-      return colors[index];
-    }
     function updateEgoList() {
       let ego = JSON.parse(localStorage.getItem("ego")) || [];
       let html = "<ul>";
       ego.forEach((e, index) => {
+        let colors = getLabelColors(e.egoLabels || []);
         let labelsHtml = "";
         if(e.egoLabels) {
-          let labels = e.egoLabels.split(',');
-          labels.forEach(l => {
-            l = l.trim();
-            if(l) {
-              let color = getBadgeColor(l);
-              labelsHtml += `<span class="badge" style="background-color: ${color};">#${l}</span>`;
-            }
+          e.egoLabels.forEach((l, idx) => {
+            labelsHtml += `<span class="badge" style="background-color:${colors[idx]};">#${l}</span> `;
           });
         }
         html += `<li>
-                  ${e.egoText} <br/><em>${e.egoTime}</em> <br/>
-                  <div class="badge-container">${labelsHtml}</div>
+                  ${e.egoText} <br/><div>${labelsHtml}</div>
                   <button class="delete-btn" onclick="deleteEgo(${index})">&times;</button>
                  </li>`;
       });
@@ -590,7 +606,7 @@
     // Box 3: Habits
     function saveHabit() {
       const habitText = document.getElementById("habitText").value;
-      const habitLabels = document.getElementById("habitLabels").value;
+      const habitLabels = document.getElementById("habitLabels").value.split(',').map(label => label.trim()).filter(Boolean);
       if (habitText.trim()) {
         let habits = JSON.parse(localStorage.getItem("habits")) || [];
         habits.push({ habitText, habitLabels });
@@ -606,19 +622,15 @@
       let habits = JSON.parse(localStorage.getItem("habits")) || [];
       let html = "<ul>";
       habits.forEach((h, index) => {
+        let colors = getLabelColors(h.habitLabels || []);
         let labelsHtml = "";
         if(h.habitLabels) {
-          let labels = h.habitLabels.split(',');
-          labels.forEach(l => {
-            l = l.trim();
-            if(l) {
-              let color = getBadgeColor(l);
-              labelsHtml += `<span class="badge" style="background-color: ${color};">#${l}</span>`;
-            }
+          h.habitLabels.forEach((l, idx) => {
+            labelsHtml += `<span class="badge" style="background-color:${colors[idx]};">#${l}</span> `;
           });
         }
         html += `<li>
-                  ${h.habitText} <br/> <div class="badge-container">${labelsHtml}</div>
+                  ${h.habitText} <br/><div>${labelsHtml}</div>
                   <button class="delete-btn" onclick="deleteHabit(${index})">&times;</button>
                  </li>`;
       });
@@ -631,7 +643,6 @@
       localStorage.setItem("habits", JSON.stringify(habits));
       updateHabitList();
     }
-    // Reset functions for individual boxes
     function resetBox(boxKey) {
       if (confirm("Reset this box?")) {
         if(boxKey === "memories") {
@@ -646,31 +657,6 @@
         }
       }
     }
-    function updateMemoryList() {
-      let memories = JSON.parse(localStorage.getItem("memories")) || [];
-      let html = "<ul>";
-      memories.forEach((m, index) => {
-        html += `<li>
-                  <strong>${m.memoryYear}</strong> (Age: ${m.ageAtMemory}): ${m.memoryText}
-                  <button class="delete-btn" onclick="deleteMemory(${index})">&times;</button>
-                 </li>`;
-      });
-      html += "</ul>";
-      document.getElementById("memoryList").innerHTML = html;
-    }
-    function deleteMemory(index) {
-      let memories = JSON.parse(localStorage.getItem("memories")) || [];
-      memories.splice(index, 1);
-      localStorage.setItem("memories", JSON.stringify(memories));
-      updateMemoryList();
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-      updateChart();
-      generateCalendar();
-      updateMemoryList();
-      updateEgoList();
-      updateHabitList();
-    });
     /* ---------- Export/Import Functions ---------- */
     function exportData() {
       let dataObj = {
@@ -682,12 +668,12 @@
       };
       let dataStr = JSON.stringify(dataObj);
       let blob = new Blob([dataStr], { type: "application/json" });
-      let url = URL.createObjectURL(blob);
-      let a = document.createElement("a");
-      a.href = url;
-      a.download = "thoughts_data.json";
-      a.click();
-      URL.revokeObjectURL(url);
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "thoughts_data.json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
     function importData(event) {
       let file = event.target.files[0];
@@ -713,6 +699,13 @@
       };
       reader.readAsText(file);
     }
+    document.addEventListener("DOMContentLoaded", function() {
+      updateChart();
+      generateCalendar();
+      updateMemoryList();
+      updateEgoList();
+      updateHabitList();
+    });
   </script>
 </body>
 </html>
